@@ -1,19 +1,21 @@
-
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { ArrowLeft } from 'lucide-react';
-import { UIProject, getProjectStatusVariant } from '../../utils/projectMappers';
-import { Project } from '../../graphql/project';
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { ArrowLeft } from "lucide-react";
+import { UIProject, getProjectStatusVariant } from "../../utils/projectMappers";
+import { Project } from "../../graphql/project";
 
 interface ProjectHeaderProps {
-  project: UIProject;
+  project: UIProject | null;
   graphqlProject?: Project;
 }
 
-export const ProjectHeader = ({ project, graphqlProject }: ProjectHeaderProps) => {
-  const { t } = useTranslation(['projects', 'common']);
+export const ProjectHeader = ({
+  project,
+  graphqlProject,
+}: ProjectHeaderProps) => {
+  const { t } = useTranslation(["projects", "common"]);
   const navigate = useNavigate();
 
   return (
@@ -21,29 +23,29 @@ export const ProjectHeader = ({ project, graphqlProject }: ProjectHeaderProps) =
       <div className="flex items-center justify-between h-14 px-4">
         <div className="flex items-center">
           <Button
-            onClick={() => navigate('/projects')}
+            onClick={() => navigate("/projects")}
             variant="ghost"
             size="sm"
             className="mr-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            {t('common:actions.back', 'Quay lại')}
+            {t("common:actions.back", "Quay lại")}
           </Button>
           <div>
             <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {project.name}
+              {project?.name || ""}
             </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-              /{project.slug}
+              /{project?.slug || ""}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Badge
-            variant={getProjectStatusVariant(project.status)}
+            variant={getProjectStatusVariant(project?.status || "ACTIVE")}
             className="text-xs"
           >
-            {t(`projects:status.${project.status.toLowerCase()}`)}
+            {t(`projects:status.${project?.status.toLowerCase()}`)}
           </Badge>
           {/* Display metadata badges */}
           {graphqlProject?.metadata && (
