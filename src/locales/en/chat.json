@@ -1,0 +1,48 @@
+{
+  "title": "Chat",
+  "newChat": "New Conversation",
+  "searchConversations": "Search conversations...",
+  "searchMessages": "Search messages...",
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "away": "Away",
+    "busy": "Busy"
+  },
+  "actions": {
+    "send": "Send",
+    "reply": "Reply",
+    "forward": "Forward",
+    "delete": "Delete",
+    "edit": "Edit",
+    "copy": "Copy",
+    "addEmoji": "Add Emoji",
+    "addAttachment": "Add Attachment"
+  },
+  "typing": {
+    "isTyping": "is typing...",
+    "areTyping": "are typing..."
+  },
+  "group": {
+    "members": "members",
+    "addMember": "Add Member",
+    "removeMember": "Remove Member",
+    "leaveGroup": "Leave Group",
+    "groupInfo": "Group Info"
+  },
+  "form": {
+    "messagePlaceholder": "Type a message...",
+    "searchPlaceholder": "Search..."
+  },
+  "empty": {
+    "noConversations": "No conversations yet",
+    "selectChat": "Select a conversation to start messaging",
+    "startChatting": "Start Chatting"
+  },
+  "time": {
+    "justNow": "Just now",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "lastWeek": "Last week"
+  }
+}

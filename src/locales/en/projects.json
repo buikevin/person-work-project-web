@@ -1,0 +1,72 @@
+{
+  "title": "Projects",
+  "subtitle": "Manage and track your projects",
+  "createNew": "Create New Project",
+  "viewDetails": "View Details",
+  "edit": "Edit",
+  "delete": "Delete",
+  "status": {
+    "active": "Active",
+    "pending": "Pending",
+    "inactive": "Inactive",
+    "planning": "Planning",
+    "completed": "Completed",
+    "paused": "Paused",
+    "cancelled": "Cancelled"
+  },
+  "details": {
+    "createdAt": "Created",
+    "members": "members",
+    "description": "Description",
+    "progress": "Progress",
+    "projects": "projects"
+  },
+  "empty": {
+    "title": "No projects yet",
+    "subtitle": "Get started by creating a new project",
+    "action": "Create your first project"
+  },
+  "form": {
+    "name": "Project Name",
+    "namePlaceholder": "Enter project name",
+    "description": "Project Description",
+    "descriptionPlaceholder": "Enter project description",
+    "members": "Members",
+    "deadline": "Deadline",
+    "priority": "Priority",
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "add": "Add Project",
+    "searchPlaceholder": "Search projects...",
+    "loading": "Loading projects...",
+    "clearFilter": "Clear Filter"
+  },
+  "search": {
+    "notFound": "No projects found",
+    "notFoundDesc": "No projects match the search term",
+    "tryAgain": "Try searching with different keywords."
+  },
+  "notFound": {
+    "title": "Project not found",
+    "heading": "Project not found",
+    "description": "The project you are looking for does not exist or has been deleted.",
+    "backToList": "Back to project list"
+  },
+  "editor": {
+    "explorer": "Explorer",
+    "code": "Code",
+    "doc": "Doc",
+    "loading": "Loading editor...",
+    "selectFile": "Select a file to start editing"
+  },
+  "chat": {
+    "title": "AI Assistant",
+    "welcomeMessage": "Hello! I can help you with source code and documentation. What do you need help with?",
+    "responseMessage": "I understand your request. Let me analyze and provide suggestions...",
+    "placeholder": "Ask AI..."
+  }
+}

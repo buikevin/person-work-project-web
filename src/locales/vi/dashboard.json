@@ -1,0 +1,23 @@
+{
+  "title": "Bảng điều khiển",
+  "welcome": "Chào mừng quay trở lại",
+  "overview": "Tổng quan",
+  "stats": {
+    "totalProjects": "Tổng dự án",
+    "activeProjects": "Dự án đang hoạt động",
+    "completedTasks": "Nhiệm vụ đã hoàn thành",
+    "teamMembers": "Thành viên nhóm"
+  },
+  "recent": {
+    "recentProjects": "Dự án gần đây",
+    "recentActivity": "Hoạt động gần đây",
+    "noProjects": "Chưa có dự án nào",
+    "noActivity": "Chưa có hoạt động nào"
+  },
+  "quickActions": {
+    "title": "Thao tác nhanh",
+    "createProject": "Tạo dự án mới",
+    "viewReports": "Xem báo cáo",
+    "manageTeam": "Quản lý nhóm"
+  }
+}

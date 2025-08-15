@@ -1,0 +1,69 @@
+{
+  "header": {
+    "userInfo": "Thông tin người dùng",
+    "userInfoDesc": "Quản lý thông tin cá nhân và cài đặt tài khoản"
+  },
+  "tabs": {
+    "profile": "Hồ sơ",
+    "security": "Bảo mật",
+    "notifications": "Thông báo",
+    "preferences": "Cài đặt"
+  },
+  "profile": {
+    "personalInfo": "Thông tin cá nhân",
+    "personalInfoDesc": "Cập nhật thông tin hồ sơ và ảnh đại diện của bạn",
+    "changePhoto": "Thay đổi ảnh",
+    "photoFormat": "JPG, GIF hoặc PNG. Tối đa 1MB.",
+    "username": "Tên đăng nhập",
+    "email": "Email",
+    "fullname": "Họ và tên",
+    "fullnamePlaceholder": "Nhập họ và tên",
+    "phone": "Số điện thoại",
+    "phonePlaceholder": "Nhập số điện thoại",
+    "address": "Địa chỉ",
+    "addressPlaceholder": "Nhập địa chỉ",
+    "birthday": "Ngày sinh",
+    "saveChanges": "Lưu thay đổi",
+    "accountInfo": "Thông tin tài khoản",
+    "accountId": "ID tài khoản",
+    "accountCreated": "Ngày tạo tài khoản",
+    "accountStatus": "Trạng thái tài khoản",
+    "verified": "Đã xác thực"
+  },
+  "security": {
+    "password": "Mật khẩu",
+    "passwordDesc": "Cập nhật mật khẩu để bảo mật tài khoản",
+    "currentPassword": "Mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "confirmPassword": "Xác nhận mật khẩu mới",
+    "changePassword": "Đổi mật khẩu",
+    "twoFactor": "Xác thực hai bước (2FA)",
+    "twoFactorDesc": "Tăng cường bảo mật với xác thực hai bước",
+    "twoFactorStatus": "Trạng thái 2FA",
+    "notActivated": "Chưa kích hoạt",
+    "activate": "Kích hoạt"
+  },
+  "notifications": {
+    "notificationSettings": "Cài đặt thông báo",
+    "notificationSettingsDesc": "Quản lý các loại thông báo bạn muốn nhận",
+    "emailNotifications": "Email thông báo",
+    "emailNotificationsDesc": "Nhận thông báo qua email",
+    "pushNotifications": "Thông báo push",
+    "pushNotificationsDesc": "Nhận thông báo trên trình duyệt",
+    "accountActivity": "Hoạt động tài khoản",
+    "accountActivityDesc": "Thông báo về các thay đổi tài khoản"
+  },
+  "preferences": {
+    "interface": "Giao diện",
+    "interfaceDesc": "Tùy chỉnh giao diện ứng dụng",
+    "darkMode": "Chế độ tối",
+    "darkModeDesc": "Sử dụng giao diện tối",
+    "language": "Ngôn ngữ",
+    "privacy": "Quyền riêng tư",
+    "privacyDesc": "Quản lý quyền riêng tư và dữ liệu cá nhân",
+    "showOnlineStatus": "Hiển thị trạng thái online",
+    "showOnlineStatusDesc": "Cho phép người khác thấy bạn đang online",
+    "publicProfile": "Hồ sơ công khai",
+    "publicProfileDesc": "Cho phép người khác xem hồ sơ của bạn"
+  }
+}

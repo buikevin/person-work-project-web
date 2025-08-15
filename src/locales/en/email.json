@@ -1,0 +1,69 @@
+{
+  "title": "Email",
+  "compose": "Compose",
+  "composeNew": "Compose New Email",
+  "folders": {
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "draft": "Draft",
+    "spam": "Spam",
+    "trash": "Trash"
+  },
+  "actions": {
+    "send": "Send",
+    "save": "Save",
+    "discard": "Discard",
+    "delete": "Delete",
+    "reply": "Reply",
+    "replyAll": "Reply All",
+    "forward": "Forward",
+    "markAsRead": "Mark as Read",
+    "markAsUnread": "Mark as Unread",
+    "archive": "Archive",
+    "selectAll": "Select All",
+    "selectNone": "Select None",
+    "deleteSelected": "Delete Selected"
+  },
+  "form": {
+    "to": "To",
+    "cc": "Cc",
+    "bcc": "Bcc",
+    "subject": "Subject",
+    "subjectPlaceholder": "Enter subject",
+    "message": "Message",
+    "messagePlaceholder": "Enter email content...",
+    "attachments": "Attachments",
+    "addAttachment": "Add Attachment"
+  },
+  "status": {
+    "sending": "Sending...",
+    "sent": "Sent",
+    "failed": "Failed to send",
+    "draft": "Draft"
+  },
+  "empty": {
+    "noEmails": "No emails",
+    "noEmailsDesc": "Your mailbox is empty",
+    "selectEmail": "Select an email to read"
+  },
+  "search": {
+    "placeholder": "Search emails...",
+    "results": "Search Results",
+    "noResults": "No results found"
+  },
+  "selection": {
+    "selectMultiple": "Select Multiple",
+    "selected": "selected"
+  },
+  "sampleData": {
+    "projectReport": "Weekly Project Progress Report",
+    "projectContent": "Hello, I'm sending this week's project progress report...",
+    "meetingNotes": "Notes from today's sprint planning meeting...",
+    "codeReview": "Hello team, I need code review for the new feature...",
+    "yesterday": "Yesterday",
+    "work": "Work",
+    "important": "Important",
+    "meeting": "Meeting",
+    "development": "Development"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "title": "Email",
+  "compose": "Soạn thư",
+  "composeNew": "Soạn thư mới",
+  "folders": {
+    "inbox": "Hộp thư đến",
+    "sent": "Đã gửi",
+    "draft": "Nháp",
+    "spam": "Thư rác",
+    "trash": "Thùng rác"
+  },
+  "actions": {
+    "send": "Gửi",
+    "save": "Lưu",
+    "discard": "Hủy bỏ",
+    "delete": "Xóa",
+    "reply": "Trả lời",
+    "replyAll": "Trả lời tất cả",
+    "forward": "Chuyển tiếp",
+    "markAsRead": "Đánh dấu đã đọc",
+    "markAsUnread": "Đánh dấu chưa đọc",
+    "archive": "Lưu trữ",
+    "selectAll": "Chọn tất cả",
+    "selectNone": "Bỏ chọn tất cả",
+    "deleteSelected": "Xóa đã chọn"
+  },
+  "form": {
+    "to": "Đến",
+    "cc": "Cc",
+    "bcc": "Bcc",
+    "subject": "Chủ đề",
+    "subjectPlaceholder": "Nhập chủ đề",
+    "message": "Nội dung",
+    "messagePlaceholder": "Nhập nội dung email...",
+    "attachments": "Đính kèm",
+    "addAttachment": "Thêm tệp đính kèm"
+  },
+  "status": {
+    "sending": "Đang gửi...",
+    "sent": "Đã gửi",
+    "failed": "Gửi thất bại",
+    "draft": "Nháp"
+  },
+  "empty": {
+    "noEmails": "Không có email nào",
+    "noEmailsDesc": "Hộp thư của bạn đang trống",
+    "selectEmail": "Chọn một email để đọc"
+  },
+  "search": {
+    "placeholder": "Tìm kiếm email...",
+    "results": "Kết quả tìm kiếm",
+    "noResults": "Không tìm thấy kết quả nào"
+  },
+  "selection": {
+    "selectMultiple": "Chọn nhiều",
+    "selected": "đã chọn"
+  },
+  "sampleData": {
+    "projectReport": "Báo cáo tiến độ dự án tuần này",
+    "projectContent": "Xin chào, tôi xin gửi báo cáo tiến độ dự án của tuần này...",
+    "meetingNotes": "Các ghi chú từ cuộc họp sprint planning hôm nay...",
+    "codeReview": "Xin chào team, tôi cần code review cho feature mới...",
+    "yesterday": "Hôm qua",
+    "work": "Công việc",
+    "important": "Quan trọng",
+    "meeting": "Meeting",
+    "development": "Development"
+  }
+}

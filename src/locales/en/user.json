@@ -1,0 +1,69 @@
+{
+  "header": {
+    "userInfo": "User Information",
+    "userInfoDesc": "Manage personal information and account settings"
+  },
+  "tabs": {
+    "profile": "Profile",
+    "security": "Security",
+    "notifications": "Notifications",
+    "preferences": "Settings"
+  },
+  "profile": {
+    "personalInfo": "Personal Information",
+    "personalInfoDesc": "Update your profile information and avatar",
+    "changePhoto": "Change Photo",
+    "photoFormat": "JPG, GIF or PNG. Maximum 1MB.",
+    "username": "Username",
+    "email": "Email",
+    "fullname": "Full Name",
+    "fullnamePlaceholder": "Enter full name",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Enter phone number",
+    "address": "Address",
+    "addressPlaceholder": "Enter address",
+    "birthday": "Birthday",
+    "saveChanges": "Save Changes",
+    "accountInfo": "Account Information",
+    "accountId": "Account ID",
+    "accountCreated": "Account Created",
+    "accountStatus": "Account Status",
+    "verified": "Verified"
+  },
+  "security": {
+    "password": "Password",
+    "passwordDesc": "Update your password to secure your account",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "changePassword": "Change Password",
+    "twoFactor": "Two-Factor Authentication (2FA)",
+    "twoFactorDesc": "Enhance security with two-factor authentication",
+    "twoFactorStatus": "2FA Status",
+    "notActivated": "Not Activated",
+    "activate": "Activate"
+  },
+  "notifications": {
+    "notificationSettings": "Notification Settings",
+    "notificationSettingsDesc": "Manage the types of notifications you want to receive",
+    "emailNotifications": "Email Notifications",
+    "emailNotificationsDesc": "Receive notifications via email",
+    "pushNotifications": "Push Notifications",
+    "pushNotificationsDesc": "Receive notifications in browser",
+    "accountActivity": "Account Activity",
+    "accountActivityDesc": "Notifications about account changes"
+  },
+  "preferences": {
+    "interface": "Interface",
+    "interfaceDesc": "Customize application interface",
+    "darkMode": "Dark Mode",
+    "darkModeDesc": "Use dark interface",
+    "language": "Language",
+    "privacy": "Privacy",
+    "privacyDesc": "Manage privacy and personal data",
+    "showOnlineStatus": "Show Online Status",
+    "showOnlineStatusDesc": "Allow others to see when you're online",
+    "publicProfile": "Public Profile",
+    "publicProfileDesc": "Allow others to view your profile"
+  }
+}

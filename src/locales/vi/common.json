@@ -1,0 +1,38 @@
+{
+  "navigation": {
+    "dashboard": "Bảng điều khiển",
+    "projects": "Dự án",
+    "email": "Email",
+    "chat": "Nhắn tin",
+    "user": "Người dùng"
+  },
+  "actions": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "create": "Tạo mới",
+    "search": "Tìm kiếm",
+    "send": "Gửi",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước đó",
+    "logout": "Đăng xuất"
+  },
+  "status": {
+    "active": "Đang hoạt động",
+    "inactive": "Không hoạt động",
+    "pending": "Đang chờ",
+    "completed": "Hoàn thành",
+    "draft": "Nháp",
+    "online": "Trực tuyến",
+    "offline": "Ngoại tuyến"
+  },
+  "validation": {
+    "required": "Trường này là bắt buộc",
+    "invalidEmail": "Email không hợp lệ",
+    "invalidPhone": "Số điện thoại không hợp lệ",
+    "success": "Thành công!",
+    "error": "Có lỗi xảy ra, vui lòng thử lại!"
+  }
+}

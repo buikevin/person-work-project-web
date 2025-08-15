@@ -1,0 +1,23 @@
+{
+  "title": "Dashboard",
+  "welcome": "Welcome back",
+  "overview": "Overview",
+  "stats": {
+    "totalProjects": "Total Projects",
+    "activeProjects": "Active Projects", 
+    "completedTasks": "Completed Tasks",
+    "teamMembers": "Team Members"
+  },
+  "recent": {
+    "recentProjects": "Recent Projects",
+    "recentActivity": "Recent Activity",
+    "noProjects": "No projects yet",
+    "noActivity": "No activity yet"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "createProject": "Create New Project",
+    "viewReports": "View Reports",
+    "manageTeam": "Manage Team"
+  }
+}

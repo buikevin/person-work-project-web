@@ -1,0 +1,48 @@
+{
+  "title": "Nhắn tin",
+  "newChat": "Cuộc trò chuyện mới",
+  "searchConversations": "Tìm kiếm cuộc trò chuyện...",
+  "searchMessages": "Tìm kiếm tin nhắn...",
+  "status": {
+    "online": "Đang hoạt động",
+    "offline": "Ngoại tuyến",
+    "away": "Vắng mặt",
+    "busy": "Bận"
+  },
+  "actions": {
+    "send": "Gửi",
+    "reply": "Trả lời",
+    "forward": "Chuyển tiếp",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "copy": "Sao chép",
+    "addEmoji": "Thêm emoji",
+    "addAttachment": "Đính kèm tệp"
+  },
+  "typing": {
+    "isTyping": "đang nhắn tin...",
+    "areTyping": "đang nhắn tin..."
+  },
+  "group": {
+    "members": "thành viên",
+    "addMember": "Thêm thành viên",
+    "removeMember": "Xóa thành viên",
+    "leaveGroup": "Rời nhóm",
+    "groupInfo": "Thông tin nhóm"
+  },
+  "form": {
+    "messagePlaceholder": "Nhập tin nhắn...",
+    "searchPlaceholder": "Tìm kiếm..."
+  },
+  "empty": {
+    "noConversations": "Chưa có cuộc trò chuyện nào",
+    "selectChat": "Chọn một cuộc trò chuyện để bắt đầu nhắn tin",
+    "startChatting": "Bắt đầu trò chuyện"
+  },
+  "time": {
+    "justNow": "Vừa xong",
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "lastWeek": "Tuần trước"
+  }
+}
