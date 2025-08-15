@@ -279,11 +279,15 @@ const DocumentPanel = ({
 };
 
 const RightSidebar = ({
-  activePanel,
-  onPanelChange
+  showLeftExplorer,
+  activeRightPanel,
+  onToggleLeftExplorer,
+  onRightPanelChange
 }: {
-  activePanel: 'explorer' | 'ai' | 'doc' | null;
-  onPanelChange: (panel: 'explorer' | 'ai' | 'doc' | null) => void;
+  showLeftExplorer: boolean;
+  activeRightPanel: 'ai' | 'doc' | null;
+  onToggleLeftExplorer: () => void;
+  onRightPanelChange: (panel: 'ai' | 'doc' | null) => void;
 }) => {
   const { t } = useTranslation(['projects', 'common']);
 
@@ -292,16 +296,22 @@ const RightSidebar = ({
       id: 'explorer' as const,
       label: t('projects:editor.explorer', 'Explorer'),
       icon: Folder,
+      onClick: onToggleLeftExplorer,
+      isActive: showLeftExplorer,
     },
     {
       id: 'ai' as const,
       label: t('projects:chat.title', 'AI Assistant'),
       icon: Bot,
+      onClick: () => onRightPanelChange(activeRightPanel === 'ai' ? null : 'ai'),
+      isActive: activeRightPanel === 'ai',
     },
     {
       id: 'doc' as const,
       label: t('projects:editor.doc', 'Document'),
       icon: BookOpen,
+      onClick: () => onRightPanelChange(activeRightPanel === 'doc' ? null : 'doc'),
+      isActive: activeRightPanel === 'doc',
     },
   ];
 
@@ -311,16 +321,15 @@ const RightSidebar = ({
         <nav className="flex flex-col space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activePanel === item.id;
 
             return (
               <Tooltip key={item.id}>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => onPanelChange(isActive ? null : item.id)}
+                    onClick={item.onClick}
                     className={cn(
                       "w-12 h-12 rounded-lg flex items-center justify-center transition-colors cursor-pointer",
-                      isActive
+                      item.isActive
                         ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
                         : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
                     )}
@@ -423,8 +432,8 @@ const ProjectDetailPage = () => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const { projectId } = useParams<{ projectId: string }>();
-  const [activeRightPanel, setActiveRightPanel] = useState<'explorer' | 'ai' | 'doc' | null>(null);
-  const [explorerCollapsed, setExplorerCollapsed] = useState(false);
+  const [showLeftExplorer, setShowLeftExplorer] = useState(true);
+  const [activeRightPanel, setActiveRightPanel] = useState<'ai' | 'doc' | null>(null);
   const [fileTree, setFileTree] = useState<TreeFileNode[]>([]);
   const [openTabs, setOpenTabs] = useState<OpenTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
@@ -494,11 +503,11 @@ const ProjectDetailPage = () => {
     setOpenTabs(newTabs);
   };
 
-  const toggleExplorerCollapse = () => {
-    setExplorerCollapsed(!explorerCollapsed);
+  const toggleLeftExplorer = () => {
+    setShowLeftExplorer(!showLeftExplorer);
   };
 
-  const handleRightPanelChange = (panel: 'explorer' | 'ai' | 'doc' | null) => {
+  const handleRightPanelChange = (panel: 'ai' | 'doc' | null) => {
     setActiveRightPanel(panel);
   };
 
@@ -629,8 +638,8 @@ const ProjectDetailPage = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex">
         <ResizablePanelGroup direction="horizontal">
-          {/* Left Explorer Panel - only show when not collapsed */}
-          {!explorerCollapsed && (
+          {/* Left Explorer Panel - only show when enabled */}
+          {showLeftExplorer && (
             <>
               <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
                 <FileExplorer
@@ -638,7 +647,7 @@ const ProjectDetailPage = () => {
                   onFileSelect={handleFileSelect}
                   selectedFile={activeTab?.path || null}
                   isCollapsed={false}
-                  onToggleCollapse={toggleExplorerCollapse}
+                  onToggleCollapse={toggleLeftExplorer}
                 />
               </ResizablePanel>
               <ResizableHandle withHandle />
@@ -647,7 +656,7 @@ const ProjectDetailPage = () => {
 
           {/* Main Editor Area */}
           <ResizablePanel 
-            defaultSize={activeRightPanel ? 60 : 80} 
+            defaultSize={activeRightPanel ? (showLeftExplorer ? 50 : 70) : (showLeftExplorer ? 70 : 90)} 
             minSize={30}
           >
             <div className="h-full flex flex-col">
@@ -723,15 +732,6 @@ const ProjectDetailPage = () => {
             <>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
-                {activeRightPanel === 'explorer' && (
-                  <FileExplorer
-                    files={fileTree}
-                    onFileSelect={handleFileSelect}
-                    selectedFile={activeTab?.path || null}
-                    isCollapsed={false}
-                    onToggleCollapse={() => setActiveRightPanel(null)}
-                  />
-                )}
                 {activeRightPanel === 'ai' && (
                   <ChatPanel
                     isCollapsed={false}
@@ -749,8 +749,10 @@ const ProjectDetailPage = () => {
 
           {/* Right Sidebar - Always visible */}
           <RightSidebar
-            activePanel={activeRightPanel}
-            onPanelChange={handleRightPanelChange}
+            showLeftExplorer={showLeftExplorer}
+            activeRightPanel={activeRightPanel}
+            onToggleLeftExplorer={toggleLeftExplorer}
+            onRightPanelChange={handleRightPanelChange}
           />
         </ResizablePanelGroup>
       </div>
