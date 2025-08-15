@@ -8,6 +8,8 @@ import {
   CopyMinus,
   FilePlus,
   FolderPlus,
+  Edit,
+  Trash2,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import {
@@ -20,18 +22,28 @@ import { TreeFileNode } from "@/utils/fileTreeUtils";
 import { startTransition, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "../../components/ui/context-menu";
 
 export const FileExplorer = ({
   files,
   onFileSelect,
   selectedFile,
   onToggleCollapse,
+  setShowCreateDialog,
+  handleAction,
 }: {
   files: TreeFileNode[];
   onFileSelect: (file: TreeFileNode, path: string) => void;
   selectedFile: string | null;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  setShowCreateDialog: (type: 'file' | 'folder' | null) => void;
+  handleAction: (node: TreeFileNode, path: string, action: string) => void;
 }) => {
   const { t } = useTranslation(["projects", "common"]);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
@@ -125,9 +137,9 @@ export const FileExplorer = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleCreateFile(fullPath);
+                        handleAction(node, fullPath, 'createFile');
                       }}
-                      className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                      className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded cursor-pointer"
                     >
                       <FilePlus className="h-3 w-3 text-gray-500 dark:text-gray-400" />
                     </button>
@@ -141,9 +153,9 @@ export const FileExplorer = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleCreateFolder(fullPath);
+                        handleAction(node, fullPath, 'createFolder');
                       }}
-                      className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
+                      className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded cursor-pointer"
                     >
                       <FolderPlus className="h-3 w-3 text-gray-500 dark:text-gray-400" />
                     </button>
@@ -195,52 +207,57 @@ export const FileExplorer = ({
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
-          className="p-1"
+          className="p-1 cursor-pointer"
         >
           <CopyMinus className="h-4 w-4" />
         </Button>
       </div>
       <div className="py-2">{files.map((file) => renderFileNode(file))}</div>
       {contextMenu && (
-        <div
+        <ContextMenuContent
           style={{ top: contextMenu.y, left: contextMenu.x }}
           className="absolute z-10 bg-white dark:bg-gray-700 shadow-lg rounded-md py-1 px-2 border border-gray-200 dark:border-gray-600 text-sm"
+          onClick={(e) => e.stopPropagation()}
         >
           <ul>
             {contextMenu.node && (
               <>
-                <li
-                  onClick={() => handleCreateFile(contextMenu.node!.path)}
-                  className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex items-center"
+                <ContextMenuItem
+                  onClick={() => handleAction(contextMenu.node!, contextMenu.node!.path, 'rename')}
+                  className="text-sm cursor-pointer"
                 >
-                  <FilePlus className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
-                  {t("common:actions.createFile", "Create new file")}
-                </li>
-                <li
-                  onClick={() => handleCreateFolder(contextMenu.node!.path)}
-                  className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex items-center"
+                  <Edit className="h-4 w-4 mr-2" />
+                  {t('projects:contextMenu.rename', 'Đổi tên')}
+                </ContextMenuItem>
+                {contextMenu.node.type === 'folder' && (
+                  <>
+                    <ContextMenuItem
+                      onClick={() => handleAction(contextMenu.node!, contextMenu.node!.path, 'createFile')}
+                      className="text-sm cursor-pointer"
+                    >
+                      <FilePlus className="h-4 w-4 mr-2" />
+                      {t('projects:contextMenu.createFile', 'Tạo file')}
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onClick={() => handleAction(contextMenu.node!, contextMenu.node!.path, 'createFolder')}
+                      className="text-sm cursor-pointer"
+                    >
+                      <FolderPlus className="h-4 w-4 mr-2" />
+                      {t('projects:contextMenu.createFolder', 'Tạo folder')}
+                    </ContextMenuItem>
+                  </>
+                )}
+                <ContextMenuItem
+                  onClick={() => handleAction(contextMenu.node!, contextMenu.node!.path, 'delete')}
+                  className="text-sm text-red-600 dark:text-red-400 cursor-pointer"
                 >
-                  <FolderPlus className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
-                  {t("common:actions.createFolder", "Create new folder")}
-                </li>
-                <li
-                  onClick={() => handleRenameNode(contextMenu.node!.path)}
-                  className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex items-center"
-                >
-                  <File className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
-                  {t("common:actions.rename", "Rename")}
-                </li>
-                <li
-                  onClick={() => handleDeleteNode(contextMenu.node!.path)}
-                  className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex items-center text-red-500"
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  {t("common:actions.delete", "Delete")}
-                </li>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t('projects:contextMenu.delete', 'Xoá')}
+                </ContextMenuItem>
               </>
             )}
           </ul>
-        </div>
+        </ContextMenuContent>
       )}
     </div>
   );

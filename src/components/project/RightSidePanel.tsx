@@ -1,4 +1,3 @@
-
 import { useState, startTransition, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../ui/button';
@@ -55,7 +54,7 @@ const ChatPanel = ({
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
-          className="p-1"
+          className="p-1 cursor-pointer"
         >
           <CopyMinus className="h-4 w-4" />
         </Button>
@@ -109,7 +108,7 @@ const DocumentPanel = ({
           variant="ghost"
           size="sm"
           onClick={onToggleCollapse}
-          className="p-1"
+          className="p-1 cursor-pointer"
         >
           <CopyMinus className="h-4 w-4" />
         </Button>

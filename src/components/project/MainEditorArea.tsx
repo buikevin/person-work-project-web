@@ -77,7 +77,7 @@ const TabBar = ({ tabs, activeTabId, onTabSelect, onTabClose }: TabBarProps) => 
           </button>
           <button
             onClick={() => onTabClose(tab.id)}
-            className="p-1 mr-1 opacity-0 group-hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-opacity"
+            className="p-1 mr-1 opacity-0 group-hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-opacity cursor-pointer"
           >
             ×
           </button>
