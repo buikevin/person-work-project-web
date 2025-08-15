@@ -179,3 +179,28 @@ export const REMOVE_PROJECT_MUTATION = gql`
     }
   }
 `;
+
+// File operations mutations
+export const CREATE_FILE_MUTATION = gql`
+  mutation CreateFileOrFolder($input: CreateFileInput!) {
+    createFileOrFolder(input: $input)
+  }
+`;
+
+export const DELETE_FILE_MUTATION = gql`
+  mutation DeleteFileOrFolder($input: DeleteFileInput!) {
+    deleteFileOrFolder(input: $input)
+  }
+`;
+
+export const RENAME_FILE_MUTATION = gql`
+  mutation RenameFileOrFolder($input: RenameFileInput!) {
+    renameFileOrFolder(input: $input)
+  }
+`;
+
+export const UPDATE_FILE_MUTATION = gql`
+  mutation UpdateFile($input: UpdateFileInput!) {
+    updateFile(input: $input)
+  }
+`;

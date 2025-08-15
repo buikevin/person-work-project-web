@@ -59,9 +59,18 @@
   "editor": {
     "explorer": "Explorer",
     "code": "Code",
-    "doc": "Doc",
+    "doc": "Document",
     "loading": "Loading editor...",
     "selectFile": "Select a file to start editing"
+  },
+  "explorer": {
+    "createFile": "Create file",
+    "createFolder": "Create folder",
+    "delete": "Delete",
+    "rename": "Rename",
+    "enterFileName": "Enter file name:",
+    "enterFolderName": "Enter folder name:",
+    "confirmDelete": "Are you sure you want to delete?"
   },
   "chat": {
     "title": "AI Assistant",

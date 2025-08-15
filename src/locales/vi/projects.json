@@ -57,11 +57,19 @@
     "backToList": "Quay về danh sách dự án"
   },
   "editor": {
-    "explorer": "Explorer",
-    "code": "Code",
-    "doc": "Doc",
+    "selectFile": "Chọn một file để bắt đầu chỉnh sửa",
     "loading": "Đang tải editor...",
-    "selectFile": "Chọn một file để bắt đầu chỉnh sửa"
+    "explorer": "Explorer",
+    "doc": "Document"
+  },
+  "explorer": {
+    "createFile": "Tạo file",
+    "createFolder": "Tạo thư mục",
+    "delete": "Xóa",
+    "rename": "Đổi tên",
+    "enterFileName": "Nhập tên file:",
+    "enterFolderName": "Nhập tên thư mục:",
+    "confirmDelete": "Bạn có chắc muốn xóa?"
   },
   "chat": {
     "title": "AI Assistant",

@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect, startTransition, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -30,15 +28,18 @@ import {
   Search,
   Image as ImageIcon,
   Minus,
-  BookOpen
+  BookOpen,
+  CopyMinus, // Import CopyMinus icon
+  FilePlus, // Import FilePlus icon
+  FolderPlus // Import FolderPlus icon
 } from 'lucide-react';
 import { Editor as LexicalEditor } from '../../components/blocks/editor-00/editor';
 import { Editor as MonacoEditor } from '@monaco-editor/react';
 import { cn } from '../../lib/utils';
 import {
   Tooltip,
-  TooltipContent,
   TooltipProvider,
+  TooltipContent,
   TooltipTrigger,
 } from '../../components/ui/tooltip';
 
@@ -82,6 +83,7 @@ const FileExplorer = ({
 }) => {
   const { t } = useTranslation(['projects', 'common']);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['src']));
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; node: TreeFileNode | null } | null>(null);
 
   const toggleFolder = (path: string) => {
     startTransition(() => {
@@ -93,6 +95,40 @@ const FileExplorer = ({
       }
       setExpandedFolders(newExpanded);
     });
+  };
+
+  const handleContextMenu = (e: React.MouseEvent, node: TreeFileNode) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({ x: e.clientX, y: e.clientY, node });
+  };
+
+  const hideContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  const handleCreateFile = (parentPath: string) => {
+    // Placeholder for create file logic
+    console.log('Create file in:', parentPath);
+    hideContextMenu();
+  };
+
+  const handleCreateFolder = (parentPath: string) => {
+    // Placeholder for create folder logic
+    console.log('Create folder in:', parentPath);
+    hideContextMenu();
+  };
+
+  const handleDeleteNode = (nodePath: string) => {
+    // Placeholder for delete node logic
+    console.log('Delete node:', nodePath);
+    hideContextMenu();
+  };
+
+  const handleRenameNode = (nodePath: string) => {
+    // Placeholder for rename node logic
+    console.log('Rename node:', nodePath);
+    hideContextMenu();
   };
 
   const renderFileNode = (node: TreeFileNode, parentPath: string = '', depth: number = 0) => {
@@ -111,6 +147,7 @@ const FileExplorer = ({
             )}
             style={{ paddingLeft: `${depth * 12 + 8}px` }}
             onClick={() => toggleFolder(fullPath)}
+            onContextMenu={(e) => handleContextMenu(e, node)}
           >
             {isExpanded ? (
               <ChevronDown className="h-3 w-3 mr-1 text-gray-500 dark:text-gray-400" />
@@ -123,6 +160,30 @@ const FileExplorer = ({
               <Folder className="h-4 w-4 mr-2 text-blue-500" />
             )}
             <span>{node.name}</span>
+            <div className="ml-auto flex items-center space-x-1">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button onClick={(e) => { e.stopPropagation(); handleCreateFile(fullPath); }} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
+                      <FilePlus className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    {t('common:actions.createFile', 'Create new file')}
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button onClick={(e) => { e.stopPropagation(); handleCreateFolder(fullPath); }} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded">
+                      <FolderPlus className="h-3 w-3 text-gray-500 dark:text-gray-400" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    {t('common:actions.createFolder', 'Create new folder')}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
           {isExpanded && node.children && node.children.length > 0 && (
             <div>
@@ -142,6 +203,7 @@ const FileExplorer = ({
           )}
           style={{ paddingLeft: `${depth * 12 + 24}px` }}
           onClick={() => onFileSelect(node, fullPath)}
+          onContextMenu={(e) => handleContextMenu(e, node)}
         >
           <File className="h-4 w-4 mr-2 text-gray-400 dark:text-gray-500" />
           <span>{node.name}</span>
@@ -151,7 +213,7 @@ const FileExplorer = ({
   };
 
   return (
-    <div className="h-full overflow-auto bg-gray-50 dark:bg-gray-900">
+    <div className="h-full overflow-auto bg-gray-50 dark:bg-gray-900" onClick={hideContextMenu}>
       <div className="p-2 border-b bg-white dark:bg-gray-800 dark:border-gray-700 flex items-center justify-between">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('projects:editor.explorer', 'Explorer')}</h3>
         <Button
@@ -160,12 +222,53 @@ const FileExplorer = ({
           onClick={onToggleCollapse}
           className="p-1"
         >
-          <Minus className="h-4 w-4" />
+          <CopyMinus className="h-4 w-4" /> {/* Changed Minus to CopyMinus */}
         </Button>
       </div>
       <div className="py-2">
         {files.map(file => renderFileNode(file))}
       </div>
+      {contextMenu && (
+        <div
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          className="absolute z-10 bg-white dark:bg-gray-700 shadow-lg rounded-md py-1 px-2 border border-gray-200 dark:border-gray-600 text-sm"
+        >
+          <ul>
+            {contextMenu.node && (
+              <>
+                <li
+                  onClick={() => handleCreateFile(contextMenu.node!.path)}
+                  className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex items-center"
+                >
+                  <FilePlus className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                  {t('common:actions.createFile', 'Create new file')}
+                </li>
+                <li
+                  onClick={() => handleCreateFolder(contextMenu.node!.path)}
+                  className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex items-center"
+                >
+                  <FolderPlus className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                  {t('common:actions.createFolder', 'Create new folder')}
+                </li>
+                <li
+                  onClick={() => handleRenameNode(contextMenu.node!.path)}
+                  className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex items-center"
+                >
+                  <FileText className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                  {t('common:actions.rename', 'Rename')}
+                </li>
+                <li
+                  onClick={() => handleDeleteNode(contextMenu.node!.path)}
+                  className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex items-center text-red-500"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  {t('common:actions.delete', 'Delete')}
+                </li>
+              </>
+            )}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
@@ -208,7 +311,7 @@ const ChatPanel = ({
           onClick={onToggleCollapse}
           className="p-1"
         >
-          <Minus className="h-4 w-4" />
+          <CopyMinus className="h-4 w-4" /> {/* Changed Minus to CopyMinus */}
         </Button>
       </div>
       <div className="flex-1 overflow-auto p-3 space-y-3">
@@ -262,7 +365,7 @@ const DocumentPanel = ({
           onClick={onToggleCollapse}
           className="p-1"
         >
-          <Minus className="h-4 w-4" />
+          <CopyMinus className="h-4 w-4" /> {/* Changed Minus to CopyMinus */}
         </Button>
       </div>
       <div className="flex-1 p-4">
@@ -449,7 +552,7 @@ const ProjectDetailPage = () => {
 
   const handleFileSelect = (file: TreeFileNode, path: string) => {
     const existingTab = openTabs.find(tab => tab.path === path);
-    
+
     if (existingTab) {
       // Tab already exists, just activate it
       setActiveTabId(existingTab.id);
@@ -467,7 +570,7 @@ const ProjectDetailPage = () => {
         node: file,
         isActive: true
       };
-      
+
       setOpenTabs(tabs => [
         ...tabs.map(tab => ({ ...tab, isActive: false })),
         newTab
@@ -487,7 +590,7 @@ const ProjectDetailPage = () => {
   const handleTabClose = (tabId: string) => {
     const tabIndex = openTabs.findIndex(tab => tab.id === tabId);
     const newTabs = openTabs.filter(tab => tab.id !== tabId);
-    
+
     if (activeTabId === tabId) {
       // If closing active tab, activate another tab
       if (newTabs.length > 0) {
@@ -499,7 +602,7 @@ const ProjectDetailPage = () => {
         setActiveTabId(null);
       }
     }
-    
+
     setOpenTabs(newTabs);
   };
 
@@ -761,4 +864,3 @@ const ProjectDetailPage = () => {
 };
 
 export default ProjectDetailPage;
-
