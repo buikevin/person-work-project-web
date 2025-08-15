@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect, startTransition, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -27,11 +28,19 @@ import {
   Menu,
   Bot,
   Search,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Minus,
+  BookOpen
 } from 'lucide-react';
 import { Editor as LexicalEditor } from '../../components/blocks/editor-00/editor';
 import { Editor as MonacoEditor } from '@monaco-editor/react';
 import { cn } from '../../lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '../../components/ui/tooltip';
 
 // Mock data as flat structure to be converted by buildFileTree
 const mockFlatFiles: FileNode[] = [
@@ -141,21 +150,6 @@ const FileExplorer = ({
     }
   };
 
-  if (isCollapsed) {
-    return (
-      <div className="w-12 h-full bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col items-center py-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleCollapse}
-          className="p-2 mb-2"
-        >
-          <Search className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <div className="h-full overflow-auto bg-gray-50 dark:bg-gray-900">
       <div className="p-2 border-b bg-white dark:bg-gray-800 dark:border-gray-700 flex items-center justify-between">
@@ -166,7 +160,7 @@ const FileExplorer = ({
           onClick={onToggleCollapse}
           className="p-1"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <Minus className="h-4 w-4" />
         </Button>
       </div>
       <div className="py-2">
@@ -201,21 +195,6 @@ const ChatPanel = ({
     });
   };
 
-  if (isCollapsed) {
-    return (
-      <div className="w-12 h-full bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col items-center py-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleCollapse}
-          className="p-2 mb-2"
-        >
-          <Bot className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <div className="h-full flex flex-col bg-white dark:bg-gray-800">
       <div className="p-3 border-b dark:border-gray-700 flex items-center justify-between">
@@ -229,7 +208,7 @@ const ChatPanel = ({
           onClick={onToggleCollapse}
           className="p-1"
         >
-          <ChevronRight className="h-4 w-4" />
+          <Minus className="h-4 w-4" />
         </Button>
       </div>
       <div className="flex-1 overflow-auto p-3 space-y-3">
@@ -263,6 +242,42 @@ const ChatPanel = ({
   );
 };
 
+const DocumentPanel = ({
+  onToggleCollapse
+}: {
+  onToggleCollapse: () => void;
+}) => {
+  const { t } = useTranslation(['projects', 'common']);
+
+  return (
+    <div className="h-full flex flex-col bg-white dark:bg-gray-800">
+      <div className="p-3 border-b dark:border-gray-700 flex items-center justify-between">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+          <FileText className="h-4 w-4 mr-2" />
+          {t('projects:editor.doc', 'Document')}
+        </h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleCollapse}
+          className="p-1"
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="flex-1 p-4">
+        <Suspense fallback={
+          <div className="h-full flex items-center justify-center">
+            <div className="text-gray-500 dark:text-gray-400">{t('projects:editor.loading', 'Đang tải editor...')}</div>
+          </div>
+        }>
+          <LexicalEditor />
+        </Suspense>
+      </div>
+    </div>
+  );
+};
+
 const RightSidebar = ({
   activePanel,
   onPanelChange
@@ -272,37 +287,55 @@ const RightSidebar = ({
 }) => {
   const { t } = useTranslation(['projects', 'common']);
 
+  const menuItems = [
+    {
+      id: 'explorer' as const,
+      label: t('projects:editor.explorer', 'Explorer'),
+      icon: Folder,
+    },
+    {
+      id: 'ai' as const,
+      label: t('projects:chat.title', 'AI Assistant'),
+      icon: Bot,
+    },
+    {
+      id: 'doc' as const,
+      label: t('projects:editor.doc', 'Document'),
+      icon: BookOpen,
+    },
+  ];
+
   return (
-    <div className="w-12 h-full bg-gray-100 dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col items-center py-2 gap-1">
-      <Button
-        variant={activePanel === 'explorer' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => onPanelChange(activePanel === 'explorer' ? null : 'explorer')}
-        className="p-2 w-10 h-10"
-        title="Explorer"
-      >
-        <Search className="h-4 w-4" />
-      </Button>
-      
-      <Button
-        variant={activePanel === 'ai' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => onPanelChange(activePanel === 'ai' ? null : 'ai')}
-        className="p-2 w-10 h-10"
-        title="AI Assistant"
-      >
-        <Bot className="h-4 w-4" />
-      </Button>
-      
-      <Button
-        variant={activePanel === 'doc' ? 'default' : 'ghost'}
-        size="sm"
-        onClick={() => onPanelChange(activePanel === 'doc' ? null : 'doc')}
-        className="p-2 w-10 h-10"
-        title="Document"
-      >
-        <FileText className="h-4 w-4" />
-      </Button>
+    <div className="w-16 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 flex flex-col items-center py-4 h-full overflow-hidden flex-shrink-0">
+      <TooltipProvider>
+        <nav className="flex flex-col space-y-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activePanel === item.id;
+
+            return (
+              <Tooltip key={item.id}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => onPanelChange(isActive ? null : item.id)}
+                    className={cn(
+                      "w-12 h-12 rounded-lg flex items-center justify-center transition-colors cursor-pointer",
+                      isActive
+                        ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
+                    )}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                  <p>{item.label}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </nav>
+      </TooltipProvider>
     </div>
   );
 };
@@ -392,7 +425,6 @@ const ProjectDetailPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const [activeRightPanel, setActiveRightPanel] = useState<'explorer' | 'ai' | 'doc' | null>(null);
   const [explorerCollapsed, setExplorerCollapsed] = useState(false);
-  const [chatCollapsed, setChatCollapsed] = useState(false);
   const [fileTree, setFileTree] = useState<TreeFileNode[]>([]);
   const [openTabs, setOpenTabs] = useState<OpenTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
@@ -464,10 +496,6 @@ const ProjectDetailPage = () => {
 
   const toggleExplorerCollapse = () => {
     setExplorerCollapsed(!explorerCollapsed);
-  };
-
-  const toggleChatCollapse = () => {
-    setChatCollapsed(!chatCollapsed);
   };
 
   const handleRightPanelChange = (panel: 'explorer' | 'ai' | 'doc' | null) => {
@@ -601,7 +629,7 @@ const ProjectDetailPage = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex">
         <ResizablePanelGroup direction="horizontal">
-          {/* Left Explorer Panel */}
+          {/* Left Explorer Panel - only show when not collapsed */}
           {!explorerCollapsed && (
             <>
               <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
@@ -617,21 +645,9 @@ const ProjectDetailPage = () => {
             </>
           )}
 
-          {explorerCollapsed && (
-            <div className="w-12 flex-shrink-0">
-              <FileExplorer
-                files={fileTree}
-                onFileSelect={handleFileSelect}
-                selectedFile={activeTab?.path || null}
-                isCollapsed={true}
-                onToggleCollapse={toggleExplorerCollapse}
-              />
-            </div>
-          )}
-
           {/* Main Editor Area */}
           <ResizablePanel 
-            defaultSize={explorerCollapsed && chatCollapsed ? 90 : explorerCollapsed || chatCollapsed ? 70 : 60} 
+            defaultSize={activeRightPanel ? 60 : 80} 
             minSize={30}
           >
             <div className="h-full flex flex-col">
@@ -702,68 +718,40 @@ const ProjectDetailPage = () => {
             </div>
           </ResizablePanel>
 
-          {/* Right AI Chat Panel */}
-          {!chatCollapsed && activeRightPanel !== 'doc' && (
+          {/* Right Panel - show content when activeRightPanel is set */}
+          {activeRightPanel && (
             <>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
-                <ChatPanel
-                  isCollapsed={false}
-                  onToggleCollapse={toggleChatCollapse}
-                />
+                {activeRightPanel === 'explorer' && (
+                  <FileExplorer
+                    files={fileTree}
+                    onFileSelect={handleFileSelect}
+                    selectedFile={activeTab?.path || null}
+                    isCollapsed={false}
+                    onToggleCollapse={() => setActiveRightPanel(null)}
+                  />
+                )}
+                {activeRightPanel === 'ai' && (
+                  <ChatPanel
+                    isCollapsed={false}
+                    onToggleCollapse={() => setActiveRightPanel(null)}
+                  />
+                )}
+                {activeRightPanel === 'doc' && (
+                  <DocumentPanel
+                    onToggleCollapse={() => setActiveRightPanel(null)}
+                  />
+                )}
               </ResizablePanel>
             </>
           )}
 
-          {/* Right Document Panel */}
-          {!chatCollapsed && activeRightPanel === 'doc' && (
-            <>
-              <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
-                <div className="h-full flex flex-col bg-white dark:bg-gray-800">
-                  <div className="p-3 border-b dark:border-gray-700 flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                      <FileText className="h-4 w-4 mr-2" />
-                      {t('projects:editor.doc', 'Document')}
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={toggleChatCollapse}
-                      className="p-1"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="flex-1 p-4">
-                    <Suspense fallback={
-                      <div className="h-full flex items-center justify-center">
-                        <div className="text-gray-500 dark:text-gray-400">{t('projects:editor.loading', 'Đang tải editor...')}</div>
-                      </div>
-                    }>
-                      <LexicalEditor />
-                    </Suspense>
-                  </div>
-                </div>
-              </ResizablePanel>
-            </>
-          )}
-
-          {(chatCollapsed || activeRightPanel !== null) && (
-            <div className="flex-shrink-0">
-              {chatCollapsed ? (
-                <ChatPanel
-                  isCollapsed={true}
-                  onToggleCollapse={toggleChatCollapse}
-                />
-              ) : (
-                <RightSidebar
-                  activePanel={activeRightPanel}
-                  onPanelChange={handleRightPanelChange}
-                />
-              )}
-            </div>
-          )}
+          {/* Right Sidebar - Always visible */}
+          <RightSidebar
+            activePanel={activeRightPanel}
+            onPanelChange={handleRightPanelChange}
+          />
         </ResizablePanelGroup>
       </div>
     </div>
@@ -771,3 +759,4 @@ const ProjectDetailPage = () => {
 };
 
 export default ProjectDetailPage;
+
