@@ -1,40 +1,29 @@
-import { useState, useEffect, startTransition, Suspense } from 'react';
-import { useNavigate, useParams } from 'react-router';
+
+import { useState, useEffect, startTransition } from 'react';
+import { useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '../../contexts/ThemeContext';
 import { Button } from '../../components/ui/button';
-import { Badge } from '../../components/ui/badge';
 import { Skeleton } from '../../components/ui/skeleton';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '../../components/ui/resizable';
 import { useProject } from '../../hooks/useProjects';
-import { mapGraphQLProjectToLocal, UIProject, getProjectStatusVariant } from '../../utils/projectMappers';
-import { ProjectStatus, FileNode } from '../../graphql/project';
+import { mapGraphQLProjectToLocal, UIProject } from '../../utils/projectMappers';
+import { FileNode } from '../../graphql/project';
 import { buildFileTree, TreeFileNode } from '../../utils/fileTreeUtils';
+import { useNavigate } from 'react-router';
+import { ProjectHeader } from '../../components/project/ProjectHeader';
+import { MainEditorArea } from '../../components/project/MainEditorArea';
+import { RightSidePanel } from '../../components/project/RightSidePanel';
 import { 
-  ArrowLeft, 
-  Code, 
-  FileText, 
-  MessageSquare, 
   Folder, 
   FolderOpen, 
   File,
   ChevronRight,
   ChevronDown,
   X,
-  ChevronLeft,
-  ChevronUp,
-  Menu,
-  Bot,
-  Search,
-  Image as ImageIcon,
-  Minus,
-  BookOpen,
-  CopyMinus, // Import CopyMinus icon
-  FilePlus, // Import FilePlus icon
-  FolderPlus // Import FolderPlus icon
+  CopyMinus,
+  FilePlus,
+  FolderPlus
 } from 'lucide-react';
-import { Editor as LexicalEditor } from '../../components/blocks/editor-00/editor';
-import { Editor as MonacoEditor } from '@monaco-editor/react';
 import { cn } from '../../lib/utils';
 import {
   Tooltip,
@@ -108,25 +97,21 @@ const FileExplorer = ({
   };
 
   const handleCreateFile = (parentPath: string) => {
-    // Placeholder for create file logic
     console.log('Create file in:', parentPath);
     hideContextMenu();
   };
 
   const handleCreateFolder = (parentPath: string) => {
-    // Placeholder for create folder logic
     console.log('Create folder in:', parentPath);
     hideContextMenu();
   };
 
   const handleDeleteNode = (nodePath: string) => {
-    // Placeholder for delete node logic
     console.log('Delete node:', nodePath);
     hideContextMenu();
   };
 
   const handleRenameNode = (nodePath: string) => {
-    // Placeholder for rename node logic
     console.log('Rename node:', nodePath);
     hideContextMenu();
   };
@@ -222,7 +207,7 @@ const FileExplorer = ({
           onClick={onToggleCollapse}
           className="p-1"
         >
-          <CopyMinus className="h-4 w-4" /> {/* Changed Minus to CopyMinus */}
+          <CopyMinus className="h-4 w-4" />
         </Button>
       </div>
       <div className="py-2">
@@ -254,7 +239,7 @@ const FileExplorer = ({
                   onClick={() => handleRenameNode(contextMenu.node!.path)}
                   className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer flex items-center"
                 >
-                  <FileText className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
+                  <File className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400" />
                   {t('common:actions.rename', 'Rename')}
                 </li>
                 <li
@@ -273,266 +258,8 @@ const FileExplorer = ({
   );
 };
 
-const ChatPanel = ({
-  isCollapsed,
-  onToggleCollapse
-}: {
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
-}) => {
-  const { t } = useTranslation(['projects', 'common']);
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: t('projects:chat.welcomeMessage', 'Xin chào! Tôi có thể giúp bạn với mã nguồn và tài liệu. Bạn cần trợ giúp gì?') },
-  ]);
-  const [inputMessage, setInputMessage] = useState('');
-
-  const sendMessage = () => {
-    if (!inputMessage.trim()) return;
-
-    startTransition(() => {
-      setMessages(prev => [...prev,
-        { role: 'user', content: inputMessage },
-        { role: 'assistant', content: t('projects:chat.responseMessage', 'Tôi hiểu yêu cầu của bạn. Hãy để tôi phân tích và đưa ra gợi ý...') }
-      ]);
-      setInputMessage('');
-    });
-  };
-
-  return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-800">
-      <div className="p-3 border-b dark:border-gray-700 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-          <MessageSquare className="h-4 w-4 mr-2" />
-          {t('projects:chat.title', 'AI Assistant')}
-        </h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleCollapse}
-          className="p-1"
-        >
-          <CopyMinus className="h-4 w-4" /> {/* Changed Minus to CopyMinus */}
-        </Button>
-      </div>
-      <div className="flex-1 overflow-auto p-3 space-y-3">
-        {messages.map((message, index) => (
-          <div key={index} className={cn(
-            "p-3 rounded-lg max-w-[80%]",
-            message.role === 'user'
-              ? "bg-blue-500 dark:bg-blue-600 text-white ml-auto"
-              : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200"
-          )}>
-            <p className="text-sm">{message.content}</p>
-          </div>
-        ))}
-      </div>
-      <div className="p-3 border-t dark:border-gray-700">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-            placeholder={t('projects:chat.placeholder', 'Hỏi AI...')}
-            className="flex-1 px-3 py-2 border dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-          />
-          <Button size="sm" onClick={sendMessage}>
-            {t('common:actions.send', 'Gửi')}
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const DocumentPanel = ({
-  onToggleCollapse
-}: {
-  onToggleCollapse: () => void;
-}) => {
-  const { t } = useTranslation(['projects', 'common']);
-
-  return (
-    <div className="h-full flex flex-col bg-white dark:bg-gray-800">
-      <div className="p-3 border-b dark:border-gray-700 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-          <FileText className="h-4 w-4 mr-2" />
-          {t('projects:editor.doc', 'Document')}
-        </h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleCollapse}
-          className="p-1"
-        >
-          <CopyMinus className="h-4 w-4" /> {/* Changed Minus to CopyMinus */}
-        </Button>
-      </div>
-      <div className="flex-1 p-4">
-        <Suspense fallback={
-          <div className="h-full flex items-center justify-center">
-            <div className="text-gray-500 dark:text-gray-400">{t('projects:editor.loading', 'Đang tải editor...')}</div>
-          </div>
-        }>
-          <LexicalEditor />
-        </Suspense>
-      </div>
-    </div>
-  );
-};
-
-const RightSidebar = ({
-  showLeftExplorer,
-  activeRightPanel,
-  onToggleLeftExplorer,
-  onRightPanelChange
-}: {
-  showLeftExplorer: boolean;
-  activeRightPanel: 'ai' | 'doc' | null;
-  onToggleLeftExplorer: () => void;
-  onRightPanelChange: (panel: 'ai' | 'doc' | null) => void;
-}) => {
-  const { t } = useTranslation(['projects', 'common']);
-
-  const menuItems = [
-    {
-      id: 'explorer' as const,
-      label: t('projects:editor.explorer', 'Explorer'),
-      icon: Folder,
-      onClick: onToggleLeftExplorer,
-      isActive: showLeftExplorer,
-    },
-    {
-      id: 'ai' as const,
-      label: t('projects:chat.title', 'AI Assistant'),
-      icon: Bot,
-      onClick: () => onRightPanelChange(activeRightPanel === 'ai' ? null : 'ai'),
-      isActive: activeRightPanel === 'ai',
-    },
-    {
-      id: 'doc' as const,
-      label: t('projects:editor.doc', 'Document'),
-      icon: BookOpen,
-      onClick: () => onRightPanelChange(activeRightPanel === 'doc' ? null : 'doc'),
-      isActive: activeRightPanel === 'doc',
-    },
-  ];
-
-  return (
-    <div className="w-16 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 flex flex-col items-center py-4 h-full overflow-hidden flex-shrink-0">
-      <TooltipProvider>
-        <nav className="flex flex-col space-y-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <Tooltip key={item.id}>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={item.onClick}
-                    className={cn(
-                      "w-12 h-12 rounded-lg flex items-center justify-center transition-colors cursor-pointer",
-                      item.isActive
-                        ? "bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
-                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100"
-                    )}
-                  >
-                    <Icon className="w-5 h-5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="left">
-                  <p>{item.label}</p>
-                </TooltipContent>
-              </Tooltip>
-            );
-          })}
-        </nav>
-      </TooltipProvider>
-    </div>
-  );
-};
-
-const isImageFile = (filename: string): boolean => {
-  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.ico'];
-  const ext = filename.toLowerCase().substring(filename.lastIndexOf('.'));
-  return imageExtensions.includes(ext);
-};
-
-const ImageViewer = ({ src, alt }: { src: string; alt: string }) => {
-  return (
-    <div className="h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="max-w-full max-h-full">
-        <img 
-          src={src} 
-          alt={alt}
-          className="max-w-full max-h-full object-contain"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            target.parentElement!.innerHTML = `
-              <div class="flex flex-col items-center text-gray-500 dark:text-gray-400">
-                <div class="h-12 w-12 mb-4">📷</div>
-                <p>Cannot load image</p>
-                <p class="text-sm">${alt}</p>
-              </div>
-            `;
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
-const TabBar = ({
-  tabs,
-  activeTabId,
-  onTabSelect,
-  onTabClose
-}: {
-  tabs: OpenTab[];
-  activeTabId: string | null;
-  onTabSelect: (tabId: string) => void;
-  onTabClose: (tabId: string) => void;
-}) => {
-  return (
-    <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 flex items-center overflow-x-auto">
-      {tabs.map((tab) => (
-        <div
-          key={tab.id}
-          className={cn(
-            "flex items-center min-w-0 max-w-[200px] border-r dark:border-gray-700 group",
-            tab.isActive
-              ? "bg-blue-50 dark:bg-blue-900/20 border-b-2 border-b-blue-500"
-              : "hover:bg-gray-50 dark:hover:bg-gray-700"
-          )}
-        >
-          <button
-            onClick={() => onTabSelect(tab.id)}
-            className={cn(
-              "flex items-center px-3 py-2 text-sm min-w-0 flex-1",
-              tab.isActive
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-gray-600 dark:text-gray-400"
-            )}
-          >
-            <File className="h-4 w-4 mr-2 flex-shrink-0" />
-            <span className="truncate">{tab.name}</span>
-          </button>
-          <button
-            onClick={() => onTabClose(tab.id)}
-            className="p-1 mr-1 opacity-0 group-hover:opacity-100 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-opacity"
-          >
-            <X className="h-3 w-3" />
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 const ProjectDetailPage = () => {
   const { t } = useTranslation(['projects', 'common']);
-  const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const { projectId } = useParams<{ projectId: string }>();
   const [showLeftExplorer, setShowLeftExplorer] = useState(true);
@@ -654,8 +381,7 @@ const ProjectDetailPage = () => {
               size="sm"
               className="mr-4"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('common:actions.back', 'Quay lại')}
+              ← {t('common:actions.back', 'Quay lại')}
             </Button>
             <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
               {t('projects:notFound.title', 'Dự án không tồn tại')}
@@ -686,57 +412,7 @@ const ProjectDetailPage = () => {
   return (
     <div className="h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-        <div className="flex items-center justify-between h-14 px-4">
-          <div className="flex items-center">
-            <Button
-              onClick={() => navigate('/projects')}
-              variant="ghost"
-              size="sm"
-              className="mr-4"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t('common:actions.back', 'Quay lại')}
-            </Button>
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {project.name}
-              </h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                /{project.slug}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge
-              variant={getProjectStatusVariant(project.status)}
-              className="text-xs"
-            >
-              {t(`projects:status.${project.status.toLowerCase()}`)}
-            </Badge>
-            {/* Display metadata badges */}
-            {graphqlProject?.metadata && (
-              <>
-                {graphqlProject.metadata.backend && (
-                  <Badge variant="outline" className="text-xs">
-                    {graphqlProject.metadata.backend}
-                  </Badge>
-                )}
-                {graphqlProject.metadata.frontend && (
-                  <Badge variant="outline" className="text-xs">
-                    {graphqlProject.metadata.frontend}
-                  </Badge>
-                )}
-                {graphqlProject.metadata.database && (
-                  <Badge variant="outline" className="text-xs">
-                    {graphqlProject.metadata.database}
-                  </Badge>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <ProjectHeader project={project} graphqlProject={graphqlProject} />
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex">
@@ -762,96 +438,17 @@ const ProjectDetailPage = () => {
             defaultSize={activeRightPanel ? (showLeftExplorer ? 50 : 70) : (showLeftExplorer ? 70 : 90)} 
             minSize={30}
           >
-            <div className="h-full flex flex-col">
-              {/* Tab Bar */}
-              {openTabs.length > 0 && (
-                <TabBar
-                  tabs={openTabs}
-                  activeTabId={activeTabId}
-                  onTabSelect={handleTabSelect}
-                  onTabClose={handleTabClose}
-                />
-              )}
-
-              {/* Editor Content */}
-              <div className="flex-1 overflow-hidden">
-                {activeTab ? (
-                  <div className="h-full flex flex-col">
-                    <div className="bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b dark:border-gray-700">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{activeTab.path}</p>
-                    </div>
-                    <div className="flex-1">
-                      <Suspense fallback={
-                        <div className="h-full flex items-center justify-center">
-                          <div className="text-gray-500 dark:text-gray-400">{t('projects:editor.loading', 'Đang tải editor...')}</div>
-                        </div>
-                      }>
-                        {isImageFile(activeTab.name) ? (
-                          <ImageViewer
-                            src={`data:image/png;base64,${activeTab.node.content || ''}`}
-                            alt={activeTab.name}
-                          />
-                        ) : activeTab.node.content ? (
-                          <MonacoEditor
-                            height="100%"
-                            language={activeTab.node.language || 'text'}
-                            value={activeTab.node.content}
-                            theme={isDarkMode ? "vs-dark" : "vs-light"}
-                            options={{
-                              fontSize: 14,
-                              lineNumbers: 'on',
-                              minimap: { enabled: false },
-                              scrollBeyondLastLine: false,
-                              automaticLayout: true,
-                            }}
-                            key={activeTab.path}
-                          />
-                        ) : (
-                          <div className="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
-                            <div className="text-center">
-                              <File className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                              <p>File content not available</p>
-                              <p className="text-sm">Type: {activeTab.node.type}</p>
-                            </div>
-                          </div>
-                        )}
-                      </Suspense>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
-                    <div className="text-center">
-                      <Code className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                      <p>{t('projects:editor.selectFile', 'Chọn một file để bắt đầu chỉnh sửa')}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <MainEditorArea
+              openTabs={openTabs}
+              activeTabId={activeTabId}
+              onTabSelect={handleTabSelect}
+              onTabClose={handleTabClose}
+            />
           </ResizablePanel>
 
-          {/* Right Panel - show content when activeRightPanel is set */}
-          {activeRightPanel && (
-            <>
-              <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
-                {activeRightPanel === 'ai' && (
-                  <ChatPanel
-                    isCollapsed={false}
-                    onToggleCollapse={() => setActiveRightPanel(null)}
-                  />
-                )}
-                {activeRightPanel === 'doc' && (
-                  <DocumentPanel
-                    onToggleCollapse={() => setActiveRightPanel(null)}
-                  />
-                )}
-              </ResizablePanel>
-            </>
-          )}
-
-          {/* Right Sidebar - Always visible */}
-          <RightSidebar
+          {/* Right Panel and Sidebar */}
+          {activeRightPanel && <ResizableHandle withHandle />}
+          <RightSidePanel
             showLeftExplorer={showLeftExplorer}
             activeRightPanel={activeRightPanel}
             onToggleLeftExplorer={toggleLeftExplorer}
