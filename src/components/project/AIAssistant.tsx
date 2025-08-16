@@ -166,69 +166,69 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
             ref={scrollViewportRef}
             className="p-3"
           >
-            <div className="space-y-3 pb-4"></div>
-          {chatLoading && chats.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                {t('common:loading', 'Đang tải...')}
-              </div>
-            </div>
-          ) : chats.length === 0 ? (
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
-              {t('projects:chat.noMessages', 'Chưa có tin nhắn nào')}
-            </div>
-          ) : (
-            chats.map((chat, index) => (
-              <div key={index} className="space-y-2">
-                {/* User Message */}
-                <div className="flex items-start gap-2">
-                  <User className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 max-w-[80%]">
-                    <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                      {chat.content}
-                    </p>
-                    {chat.timestamp && (
-                      <p className="text-xs text-gray-400 mt-1">
-                        {new Date(chat.timestamp).toLocaleTimeString()}
-                      </p>
+            <div className="space-y-3 pb-4">
+              {chatLoading && chats.length === 0 ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t('common:loading', 'Đang tải...')}
+                  </div>
+                </div>
+              ) : chats.length === 0 ? (
+                <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
+                  {t('projects:chat.noMessages', 'Chưa có tin nhắn nào')}
+                </div>
+              ) : (
+                chats.map((chat, index) => (
+                  <div key={index} className="space-y-2">
+                    {/* User Message */}
+                    <div className="flex items-start gap-2">
+                      <User className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
+                      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 max-w-[80%]">
+                        <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
+                          {chat.content}
+                        </p>
+                        {chat.timestamp && (
+                          <p className="text-xs text-gray-400 mt-1">
+                            {new Date(chat.timestamp).toLocaleTimeString()}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* AI Response */}
+                    {chat.response && (
+                      <div className="flex items-start gap-2">
+                        <Bot className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
+                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 max-w-[80%]">
+                          <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
+                            {chat.response}
+                          </p>
+                        </div>
+                      </div>
                     )}
                   </div>
-                </div>
+                ))
+              )}
 
-                {/* AI Response */}
-                {chat.response && (
-                  <div className="flex items-start gap-2">
-                    <Bot className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 max-w-[80%]">
-                      <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                        {chat.response}
-                      </p>
+              {/* Thinking state when sending message */}
+              {sendingMessage && (
+                <div className="flex items-start gap-2">
+                  <Bot className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex space-x-1">
+                        <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div>
+                        <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        Thinking...
+                      </span>
                     </div>
                   </div>
-                )}
-              </div>
-            ))
-          )}
-
-          {/* Thinking state when sending message */}
-          {sendingMessage && (
-            <div className="flex items-start gap-2">
-              <Bot className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
-                <div className="flex items-center gap-2">
-                  <div className="flex space-x-1">
-                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div>
-                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    Thinking...
-                  </span>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
             </div>
           </div>
         </ScrollArea>
