@@ -1,4 +1,3 @@
-
 import { gql } from "@apollo/client";
 
 // Re-export types for easier importing in components
@@ -208,8 +207,18 @@ export const UPDATE_FILE_MUTATION = gql`
 
 // Chat operations - Updated to use ChatPaginationResponse
 export const GET_CHATS_BY_USER_AND_PROJECT_QUERY = gql`
-  query ChatsByUserAndProjectPaginated($userId: String!, $projectId: String!, $page: Int!, $limit: Int!) {
-    chatsByUserAndProjectPaginated(userId: $userId, projectId: $projectId, page: $page, limit: $limit) {
+  query ChatsByUserAndProjectPaginated(
+    $userId: String!
+    $projectId: String!
+    $page: Float!
+    $limit: Float!
+  ) {
+    chatsByUserAndProjectPaginated(
+      userId: $userId
+      projectId: $projectId
+      page: $page
+      limit: $limit
+    ) {
       messages {
         role
         content
