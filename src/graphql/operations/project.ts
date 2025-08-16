@@ -1,3 +1,4 @@
+
 import { gql } from "@apollo/client";
 
 // Re-export types for easier importing in components
@@ -11,10 +12,14 @@ export type {
   FileNode,
   FileContent,
   ReadFileInput,
+  CreateFileInput,
+  UpdateFileInput,
+  DeleteFileInput,
+  RenameFileInput,
   CreateChatInput,
-  Chat,
   ChatMessage,
-  ChatResponse,
+  ChatBucket,
+  ChatPaginationResponse,
 } from "../project";
 
 // Get all projects query
@@ -62,6 +67,8 @@ export const GET_PROJECT_QUERY = gql`
         language
         content
       }
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -99,20 +106,10 @@ export const GET_PROJECT_BY_SLUG_QUERY = gql`
       content {
         name
         type
-        children {
-          name
-          type
-          children {
-            name
-            type
-            content
-            language
-          }
-          content
-          language
-        }
-        content
+        path
+        parentPath
         language
+        content
       }
       createdAt
       updatedAt
@@ -174,7 +171,7 @@ export const UPDATE_PROJECT_MUTATION = gql`
 
 // Remove project mutation
 export const REMOVE_PROJECT_MUTATION = gql`
-  mutation RemoveProject($id: ID!) {
+  mutation RemoveProject($id: String!) {
     removeProject(id: $id) {
       _id
       name
@@ -209,7 +206,7 @@ export const UPDATE_FILE_MUTATION = gql`
   }
 `;
 
-// Chat operations
+// Chat operations - Updated to use ChatPaginationResponse
 export const GET_CHATS_BY_USER_AND_PROJECT_QUERY = gql`
   query ChatsByUserAndProjectPaginated($userId: String!, $projectId: String!, $page: Int!, $limit: Int!) {
     chatsByUserAndProjectPaginated(userId: $userId, projectId: $projectId, page: $page, limit: $limit) {
@@ -230,7 +227,9 @@ export const GET_CHATS_BY_USER_AND_PROJECT_QUERY = gql`
 export const CREATE_CHAT_MUTATION = gql`
   mutation CreateChat($createChatInput: CreateChatInput!) {
     createChat(createChatInput: $createChatInput) {
-      message
+      role
+      content
+      timestamp
     }
   }
 `;
@@ -238,7 +237,9 @@ export const CREATE_CHAT_MUTATION = gql`
 export const CHAT_UPDATED_SUBSCRIPTION = gql`
   subscription ChatUpdated($projectId: String!, $userId: String!) {
     chatUpdated(projectId: $projectId, userId: $userId) {
-      message
+      role
+      content
+      timestamp
     }
   }
 `;
