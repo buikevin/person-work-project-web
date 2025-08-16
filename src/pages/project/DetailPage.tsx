@@ -19,6 +19,7 @@ import { ProjectHeader } from "../../components/project/ProjectHeader";
 import { MainEditorArea } from "../../components/project/MainEditorArea";
 import { RightSidePanel } from "../../components/project/RightSidePanel";
 import { FileExplorer } from "@/components/project/FileExplorer";
+import { useAppSelector } from "../../store/hooks";
 
 interface OpenTab {
   id: string;
@@ -39,6 +40,10 @@ const ProjectDetailPage = () => {
   const [fileTree, setFileTree] = useState<TreeFileNode[]>([]);
   const [openTabs, setOpenTabs] = useState<OpenTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
+
+  // Get user ID from Redux store or localStorage
+  const { user } = useAppSelector((state) => state.auth);
+  const userId = user?._id || localStorage.getItem('userId') || '';
 
   // Use GraphQL hook to fetch project data
   const {
@@ -247,7 +252,7 @@ const ProjectDetailPage = () => {
             onToggleLeftExplorer={toggleLeftExplorer}
             onRightPanelChange={handleRightPanelChange}
             project={graphqlProject || undefined}
-            userId="default-user" // TODO: Get from auth context
+            userId={userId}
           />
         </ResizablePanelGroup>
       </div>
