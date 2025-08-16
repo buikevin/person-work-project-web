@@ -211,14 +211,18 @@ export const UPDATE_FILE_MUTATION = gql`
 
 // Chat operations
 export const GET_CHATS_BY_USER_AND_PROJECT_QUERY = gql`
-  query ChatsByUserAndProject($userId: String!, $projectId: String!) {
-    chatsByUserAndProject(userId: $userId, projectId: $projectId) {
-      message
-      userId
-      projectId
-      response
-      status
-      timestamp
+  query ChatsByUserAndProjectPaginated($userId: String!, $projectId: String!, $page: Int!, $limit: Int!) {
+    chatsByUserAndProjectPaginated(userId: $userId, projectId: $projectId, page: $page, limit: $limit) {
+      messages {
+        role
+        content
+        timestamp
+      }
+      totalMessages
+      totalPages
+      currentPage
+      hasNextPage
+      hasPrevPage
     }
   }
 `;

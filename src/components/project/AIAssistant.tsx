@@ -5,7 +5,7 @@ import { useQuery, useMutation, useSubscription } from '@apollo/client';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ScrollArea } from '../ui/scroll-area';
-import { Send, Bot, User } from 'lucide-react';
+import { Send, Bot, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   GET_CHATS_BY_USER_AND_PROJECT_QUERY,
@@ -25,28 +25,35 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
   const { t } = useTranslation(['projects', 'common']);
   const [message, setMessage] = useState('');
   const [isInitialized, setIsInitialized] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollViewportRef = useRef<HTMLDivElement>(null);
 
-  // Get chat history
+  // Get chat history with pagination
   const {
     data: chatData,
     loading: chatLoading,
     refetch: refetchChats,
+    fetchMore,
   } = useQuery(GET_CHATS_BY_USER_AND_PROJECT_QUERY, {
     variables: {
       userId,
       projectId: project._id,
+      page: 1,
+      limit: 50,
     },
     fetchPolicy: 'cache-and-network',
   });
 
   // Create chat mutation
-  const [createChat, { loading: sendingMessage }] = useMutation(CREATE_CHAT_MUTATION, {
-    onCompleted: () => {
+  const [createChat] = useMutation(CREATE_CHAT_MUTATION, {
+    onCompleted: (data) => {
       setMessage('');
+      setSendingMessage(false);
       refetchChats();
     },
     onError: (error) => {
+      setSendingMessage(false);
       toast.error('Không thể gửi tin nhắn', {
         description: error.message,
       });
@@ -64,7 +71,8 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
     },
   });
 
-  const chats: ChatMessage[] = chatData?.chatsByUserAndProject || [];
+  const chatPagination = chatData?.chatsByUserAndProjectPaginated;
+  const chats: ChatMessage[] = chatPagination?.messages || [];
 
   // Initialize chat with project structure if no chat history
   useEffect(() => {
@@ -89,18 +97,23 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
     }
   }, [chatLoading, chats.length, isInitialized, project.content, project._id, userId, createChat]);
 
-  // Auto scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollElement) {
-        scrollElement.scrollTop = scrollElement.scrollHeight;
-      }
+  // Auto scroll to bottom when new messages arrive or component mounts
+  const scrollToBottom = () => {
+    if (scrollViewportRef.current) {
+      scrollViewportRef.current.scrollTop = scrollViewportRef.current.scrollHeight;
     }
-  }, [chats]);
+  };
+
+  useEffect(() => {
+    // Scroll to bottom after messages load or update
+    const timer = setTimeout(scrollToBottom, 100);
+    return () => clearTimeout(timer);
+  }, [chats, sendingMessage]);
 
   const handleSendMessage = async () => {
     if (!message.trim() || sendingMessage) return;
+
+    setSendingMessage(true);
 
     try {
       await createChat({
@@ -114,6 +127,7 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
       });
     } catch (error) {
       console.error('Error sending message:', error);
+      setSendingMessage(false);
     }
   };
 
@@ -133,18 +147,30 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
           <h3 className="font-medium text-sm text-gray-900 dark:text-white">
             AI Assistant
           </h3>
+          {chatLoading && (
+            <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
+          )}
         </div>
       </div>
 
       {/* Chat Messages */}
-      <ScrollArea ref={scrollAreaRef} className="flex-1 p-3">
-        <div className="space-y-3">
-          {chatLoading ? (
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-              {t('common:loading', 'Đang tải...')}
+      <ScrollArea 
+        ref={scrollAreaRef} 
+        className="flex-1 p-3"
+        onViewportRef={(viewport) => {
+          scrollViewportRef.current = viewport;
+        }}
+      >
+        <div className="space-y-3 pb-4">
+          {chatLoading && chats.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {t('common:loading', 'Đang tải...')}
+              </div>
             </div>
           ) : chats.length === 0 ? (
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-center text-sm text-gray-500 dark:text-gray-400 py-8">
               {t('projects:chat.noMessages', 'Chưa có tin nhắn nào')}
             </div>
           ) : (
@@ -155,8 +181,13 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
                   <User className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
                   <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 max-w-[80%]">
                     <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                      {chat.message}
+                      {chat.content}
                     </p>
+                    {chat.timestamp && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(chat.timestamp).toLocaleTimeString()}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -171,33 +202,33 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
                     </div>
                   </div>
                 )}
-
-                {/* Loading state for pending response */}
-                {chat.status === 'pending' && !chat.response && (
-                  <div className="flex items-start gap-2">
-                    <Bot className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
-                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
-                      <div className="flex items-center gap-1">
-                        <div className="flex space-x-1">
-                          <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div>
-                          <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                          <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                          AI đang suy nghĩ...
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             ))
+          )}
+
+          {/* Thinking state when sending message */}
+          {sendingMessage && (
+            <div className="flex items-start gap-2">
+              <Bot className="h-4 w-4 text-blue-500 mt-1 flex-shrink-0" />
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex space-x-1">
+                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></div>
+                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    Thinking...
+                  </span>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </ScrollArea>
 
-      {/* Message Input */}
-      <div className="border-t border-gray-200 dark:border-gray-700 p-3">
+      {/* Message Input - Always at bottom */}
+      <div className="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900">
         <div className="flex items-center gap-2">
           <Input
             value={message}
@@ -213,7 +244,11 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
             size="sm"
             className="px-3"
           >
-            <Send className="h-3 w-3" />
+            {sendingMessage ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Send className="h-3 w-3" />
+            )}
           </Button>
         </div>
       </div>
