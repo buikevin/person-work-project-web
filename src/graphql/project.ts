@@ -116,28 +116,31 @@ export interface Project {
   updatedAt: DateTime;
 }
 
-export interface Chat {
+export interface ChatMessage {
+  role: string;
+  content: string;
+  timestamp: DateTime;
+}
+
+export interface ChatBucket {
   _id: string;
-  message: string;
+  sessionId: string;
   userId: string;
   projectId: string;
-  response?: Nullable<string>;
-  status: string;
+  messages: ChatMessage[];
+  count: number;
+  isFull: boolean;
   createdAt: DateTime;
   updatedAt: DateTime;
 }
 
-export interface ChatMessage {
-  message: string;
-  userId: string;
-  projectId: string;
-  response?: Nullable<string>;
-  status: string;
-  timestamp: DateTime;
-}
-
-export interface ChatResponse {
-  message: string;
+export interface ChatPaginationResponse {
+  messages: ChatMessage[];
+  totalMessages: number;
+  totalPages: number;
+  currentPage: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
 export interface IQuery {
@@ -147,18 +150,22 @@ export interface IQuery {
   readFile(input: ReadFileInput): FileContent | Promise<FileContent>;
   chatsByUserAndProject(
     userId: string,
-    projectId: string,
+    projectId: string
   ): ChatMessage[] | Promise<ChatMessage[]>;
-  chats(): Chat[] | Promise<Chat[]>;
-  chat(id: string): Nullable<Chat> | Promise<Nullable<Chat>>;
+  chatsByUserAndProjectPaginated(
+    userId: string,
+    projectId: string,
+    page: number,
+    limit: number
+  ): ChatPaginationResponse | Promise<ChatPaginationResponse>;
 }
 
 export interface IMutation {
   createProject(
-    createProjectInput: CreateProjectInput,
+    createProjectInput: CreateProjectInput
   ): Project | Promise<Project>;
   updateProject(
-    updateProjectInput: UpdateProjectInput,
+    updateProjectInput: UpdateProjectInput
   ): Project | Promise<Project>;
   removeProject(id: string): Project | Promise<Project>;
   createFileOrFolder(input: CreateFileInput): boolean | Promise<boolean>;
@@ -166,8 +173,8 @@ export interface IMutation {
   deleteFileOrFolder(input: DeleteFileInput): boolean | Promise<boolean>;
   renameFileOrFolder(input: RenameFileInput): boolean | Promise<boolean>;
   createChat(
-    createChatInput: CreateChatInput,
-  ): ChatResponse | Promise<ChatResponse>;
+    createChatInput: CreateChatInput
+  ): ChatMessage | Promise<ChatMessage>;
 }
 
 export interface ISubscription {
@@ -177,8 +184,8 @@ export interface ISubscription {
   fileRenamed(): string | Promise<string>;
   chatUpdated(
     projectId: string,
-    userId: string,
-  ): ChatResponse | Promise<ChatResponse>;
+    userId: string
+  ): ChatMessage | Promise<ChatMessage>;
 }
 
 export type DateTime = any;
