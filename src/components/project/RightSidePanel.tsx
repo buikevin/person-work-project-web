@@ -17,6 +17,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '../ui/tooltip';
+import { AIAssistant } from "./AIAssistant";
+import { Project } from "../../graphql/project";
 
 const ChatPanel = ({
   isCollapsed,
@@ -199,16 +201,20 @@ const RightSidebar = ({
 
 interface RightSidePanelProps {
   showLeftExplorer: boolean;
-  activeRightPanel: 'ai' | 'doc' | null;
+  activeRightPanel: "ai" | "doc" | null;
   onToggleLeftExplorer: () => void;
-  onRightPanelChange: (panel: 'ai' | 'doc' | null) => void;
+  onRightPanelChange: (panel: "ai" | "doc" | null) => void;
+  project?: Project;
+  userId?: string;
 }
 
 export const RightSidePanel = ({
   showLeftExplorer,
   activeRightPanel,
   onToggleLeftExplorer,
-  onRightPanelChange
+  onRightPanelChange,
+  project,
+  userId = "default-user", // TODO: Get from auth context
 }: RightSidePanelProps) => {
   return (
     <>
@@ -217,10 +223,23 @@ export const RightSidePanel = ({
         <div className="flex">
           <div className="w-80">
             {activeRightPanel === 'ai' && (
-              <ChatPanel
-                isCollapsed={false}
-                onToggleCollapse={() => onRightPanelChange(null)}
-              />
+              <div className="flex-1 overflow-hidden">
+                {project ? (
+                  <AIAssistant project={project} userId={userId} />
+                ) : (
+                  <div className="flex-1 p-4">
+                    <div className="text-center py-8">
+                      <Bot className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium mb-2 dark:text-white">
+                        AI Assistant
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Không thể tải AI Assistant
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
             {activeRightPanel === 'doc' && (
               <DocumentPanel

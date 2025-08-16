@@ -246,6 +246,8 @@ const ProjectDetailPage = () => {
             activeRightPanel={activeRightPanel}
             onToggleLeftExplorer={toggleLeftExplorer}
             onRightPanelChange={handleRightPanelChange}
+            project={graphqlProject || undefined}
+            userId="default-user" // TODO: Get from auth context
           />
         </ResizablePanelGroup>
       </div>

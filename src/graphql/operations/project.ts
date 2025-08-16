@@ -11,6 +11,10 @@ export type {
   FileNode,
   FileContent,
   ReadFileInput,
+  CreateChatInput,
+  Chat,
+  ChatMessage,
+  ChatResponse,
 } from "../project";
 
 // Get all projects query
@@ -202,5 +206,35 @@ export const RENAME_FILE_MUTATION = gql`
 export const UPDATE_FILE_MUTATION = gql`
   mutation UpdateFile($input: UpdateFileInput!) {
     updateFile(input: $input)
+  }
+`;
+
+// Chat operations
+export const GET_CHATS_BY_USER_AND_PROJECT_QUERY = gql`
+  query ChatsByUserAndProject($userId: String!, $projectId: String!) {
+    chatsByUserAndProject(userId: $userId, projectId: $projectId) {
+      message
+      userId
+      projectId
+      response
+      status
+      timestamp
+    }
+  }
+`;
+
+export const CREATE_CHAT_MUTATION = gql`
+  mutation CreateChat($createChatInput: CreateChatInput!) {
+    createChat(createChatInput: $createChatInput) {
+      message
+    }
+  }
+`;
+
+export const CHAT_UPDATED_SUBSCRIPTION = gql`
+  subscription ChatUpdated($projectId: String!, $userId: String!) {
+    chatUpdated(projectId: $projectId, userId: $userId) {
+      message
+    }
   }
 `;

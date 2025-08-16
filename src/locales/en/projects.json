@@ -72,10 +72,17 @@
     "enterFolderName": "Enter folder name:",
     "confirmDelete": "Are you sure you want to delete?"
   },
+  "actions": {
+    "create": "Create",
+    "createFile": "Create File",
+    "createFolder": "Create Folder",
+    "delete": "Delete",
+    "rename": "Rename"
+  },
   "chat": {
-    "title": "AI Assistant",
-    "welcomeMessage": "Hello! I can help you with source code and documentation. What do you need help with?",
-    "responseMessage": "I understand your request. Let me analyze and provide suggestions...",
-    "placeholder": "Ask AI..."
+    "placeholder": "Type a message...",
+    "noMessages": "No messages yet",
+    "sending": "Sending...",
+    "aiThinking": "AI is thinking..."
   }
 }
