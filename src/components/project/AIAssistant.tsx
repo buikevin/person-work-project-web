@@ -99,8 +99,11 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
 
   // Auto scroll to bottom when new messages arrive or component mounts
   const scrollToBottom = () => {
-    if (scrollViewportRef.current) {
-      scrollViewportRef.current.scrollTop = scrollViewportRef.current.scrollHeight;
+    if (scrollAreaRef.current) {
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement;
+      if (viewport) {
+        viewport.scrollTop = viewport.scrollHeight;
+      }
     }
   };
 
@@ -139,7 +142,7 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900 overflow-hidden">
       {/* Header */}
       <div className="p-3 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
@@ -154,14 +157,16 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
       </div>
 
       {/* Chat Messages */}
-      <ScrollArea 
-        ref={scrollAreaRef} 
-        className="flex-1 p-3"
-        onViewportRef={(viewport) => {
-          scrollViewportRef.current = viewport;
-        }}
-      >
-        <div className="space-y-3 pb-4">
+      <div className="flex-1 relative">
+        <ScrollArea 
+          ref={scrollAreaRef} 
+          className="absolute inset-0"
+        >
+          <div 
+            ref={scrollViewportRef}
+            className="p-3"
+          >
+            <div className="space-y-3 pb-4"></div>
           {chatLoading && chats.length === 0 ? (
             <div className="flex items-center justify-center py-8">
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
@@ -224,8 +229,10 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
               </div>
             </div>
           )}
-        </div>
-      </ScrollArea>
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
 
       {/* Message Input - Always at bottom */}
       <div className="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900">
