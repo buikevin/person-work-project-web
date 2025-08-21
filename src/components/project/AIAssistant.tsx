@@ -5,7 +5,7 @@ import { useQuery, useMutation, useSubscription } from '@apollo/client';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ScrollArea } from '../ui/scroll-area';
-import { Send, Bot, User, Loader2 } from 'lucide-react';
+import { Send, Bot, User, Loader2, Paperclip, X } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   GET_CHATS_BY_USER_AND_PROJECT_QUERY,
@@ -26,8 +26,11 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
   const [message, setMessage] = useState('');
   const [isInitialized, setIsInitialized] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewImages, setPreviewImages] = useState<string[]>([]);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const scrollViewportRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Get chat history with pagination
   const {
@@ -114,20 +117,41 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
   }, [chats, sendingMessage]);
 
   const handleSendMessage = async () => {
-    if (!message.trim() || sendingMessage) return;
+    if ((!message.trim() && previewImages.length === 0) || sendingMessage) return;
 
     setSendingMessage(true);
 
     try {
-      await createChat({
-        variables: {
-          createChatInput: {
-            message: message.trim(),
-            userId,
-            projectId: project._id,
-          } as CreateChatInput,
-        },
-      });
+      // If we have preview images, send them first
+      if (previewImages.length > 0) {
+        for (const imageStr of previewImages) {
+          await createChat({
+            variables: {
+              createChatInput: {
+                message: imageStr,
+                userId,
+                projectId: project._id,
+              } as CreateChatInput,
+            },
+          });
+        }
+        // Clear preview images after sending
+        setPreviewImages([]);
+        setSelectedFiles([]);
+      }
+
+      // Send text message if exists
+      if (message.trim()) {
+        await createChat({
+          variables: {
+            createChatInput: {
+              message: message.trim(),
+              userId,
+              projectId: project._id,
+            } as CreateChatInput,
+          },
+        });
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       setSendingMessage(false);
@@ -139,6 +163,77 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Validate file types and sizes
+    const validFiles = files.filter(file => {
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      
+      if (file.size > maxSize) {
+        toast.error(`File ${file.name} quá lớn`, {
+          description: 'Kích thước file phải nhỏ hơn 5MB'
+        });
+        return false;
+      }
+      
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(`File ${file.name} không hợp lệ`, {
+          description: 'Chỉ hỗ trợ file ảnh (JPG, PNG, GIF, WEBP)'
+        });
+        return false;
+      }
+      
+      return true;
+    });
+
+    setSelectedFiles(prev => [...prev, ...validFiles]);
+
+    // Create preview for images
+    validFiles.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          const imageData = {
+            svg: e.target.result as string,
+            type: 'image',
+            projectId: `person-work-project-${Date.now()}`
+          };
+          setPreviewImages(prev => [...prev, JSON.stringify(imageData)]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Clear input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removePreviewImage = (index: number) => {
+    setPreviewImages(prev => prev.filter((_, i) => i !== index));
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const parseMessageForImages = (text: string) => {
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed.svg && parsed.type && parsed.projectId && parsed.projectId.includes('person-work-project')) {
+        return parsed;
+      }
+    } catch (e) {
+      // Not a valid JSON, return null
+    }
+    return null;
   };
 
   return (
@@ -185,9 +280,28 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
                     <div className="flex items-start gap-2">
                       <User className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
                       <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 max-w-[80%]">
-                        <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
-                          {chat.content}
-                        </p>
+                        {(() => {
+                          const imageData = parseMessageForImages(chat.content);
+                          if (imageData) {
+                            return (
+                              <div className="space-y-2">
+                                <img 
+                                  src={imageData.svg} 
+                                  alt="Uploaded image" 
+                                  className="max-w-full h-auto rounded border"
+                                  style={{ maxHeight: '200px' }}
+                                />
+                                <p className="text-xs text-gray-500">Image uploaded</p>
+                              </div>
+                            );
+                          } else {
+                            return (
+                              <p className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
+                                {chat.content}
+                              </p>
+                            );
+                          }
+                        })()}
                         {chat.timestamp && (
                           <p className="text-xs text-gray-400 mt-1">
                             {new Date(chat.timestamp).toLocaleTimeString()}
@@ -235,29 +349,76 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
       </div>
 
       {/* Message Input - Always at bottom */}
-      <div className="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900">
-        <div className="flex items-center gap-2">
-          <Input
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={t('projects:chat.placeholder', 'Nhập tin nhắn...')}
-            className="flex-1 text-sm"
-            disabled={sendingMessage}
-          />
-          <Button
-            onClick={handleSendMessage}
-            disabled={!message.trim() || sendingMessage}
-            size="sm"
-            className="px-3"
-          >
-            {sendingMessage ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
-            ) : (
-              <Send className="h-3 w-3" />
-            )}
-          </Button>
+      <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        {/* Image Preview */}
+        {previewImages.length > 0 && (
+          <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex flex-wrap gap-2">
+              {previewImages.map((imageStr, index) => {
+                const imageData = parseMessageForImages(imageStr);
+                return imageData ? (
+                  <div key={index} className="relative group">
+                    <img 
+                      src={imageData.svg} 
+                      alt={`Preview ${index + 1}`} 
+                      className="w-16 h-16 object-cover rounded border"
+                    />
+                    <button
+                      onClick={() => removePreviewImage(index)}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : null;
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="p-3">
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleFileSelect}
+              size="sm"
+              variant="ghost"
+              className="px-2 cursor-pointer"
+              disabled={sendingMessage}
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
+            <Input
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={t('projects:chat.placeholder', 'Nhập tin nhắn...')}
+              className="flex-1 text-sm"
+              disabled={sendingMessage}
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={(!message.trim() && previewImages.length === 0) || sendingMessage}
+              size="sm"
+              className="px-3"
+            >
+              {sendingMessage ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Send className="h-3 w-3" />
+              )}
+            </Button>
+          </div>
         </div>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+          className="hidden"
+        />
       </div>
     </div>
   );
