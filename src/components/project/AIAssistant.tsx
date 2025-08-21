@@ -237,9 +237,9 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="flex flex-col h-full bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex-shrink-0 p-3 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
           <Bot className="h-4 w-4 text-blue-500" />
           <h3 className="font-medium text-sm text-gray-900 dark:text-white">
@@ -251,17 +251,17 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
         </div>
       </div>
 
-      {/* Chat Messages */}
-      <div className="flex-1 relative">
+      {/* Chat Messages - Scrollable Area */}
+      <div className="flex-1 min-h-0">
         <ScrollArea 
           ref={scrollAreaRef} 
-          className="absolute inset-0"
+          className="h-full"
         >
           <div 
             ref={scrollViewportRef}
             className="p-3"
           >
-            <div className="space-y-3 pb-4">
+            <div className="space-y-3">
               {chatLoading && chats.length === 0 ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
@@ -343,13 +343,16 @@ export const AIAssistant = ({ project, userId }: AIAssistantProps) => {
                   </div>
                 </div>
               )}
+              
+              {/* Extra spacing at bottom to ensure last message is visible */}
+              <div className="h-4"></div>
             </div>
           </div>
         </ScrollArea>
       </div>
 
-      {/* Message Input - Always at bottom */}
-      <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      {/* Message Input - Fixed at bottom */}
+      <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         {/* Image Preview */}
         {previewImages.length > 0 && (
           <div className="p-3 border-b border-gray-200 dark:border-gray-700">
